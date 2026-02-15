@@ -1,0 +1,8 @@
+build/
+.build/
+.dev-app/
+.dev-logs/
+.DS_Store
+artifacts/
+.vscode/
+.env.release
