@@ -204,7 +204,9 @@ codesign \
 
 log "Verifying app signature"
 codesign --verify --deep --strict --verbose=2 "$APP_PATH"
-spctl -a -t exec -vv "$APP_PATH"
+if ! spctl -a -t exec -vv "$APP_PATH"; then
+  log "Pre-notarization Gatekeeper check failed for app (expected on some systems). Continuing."
+fi
 
 cp -R "$APP_PATH" "$DMG_STAGING_DIR/"
 ln -s /Applications "$DMG_STAGING_DIR/Applications"
