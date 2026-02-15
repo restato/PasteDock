@@ -18,6 +18,8 @@
 
 - `PasteDock-vX.Y.Z.dmg`
 - `PasteDock-vX.Y.Z.dmg.sha256`
+- `PasteDock.dmg` (latest 고정 파일명)
+- `PasteDock.dmg.sha256` (latest 고정 파일명)
 - `metadata.txt`
 
 ## Checksum

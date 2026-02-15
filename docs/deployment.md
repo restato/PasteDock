@@ -7,12 +7,18 @@
 1. 서명된 `.app` 번들
 2. 서명 + 노타라이즈 + 스테이플된 `.dmg`
 3. `.dmg.sha256` 체크섬
-4. `metadata.txt` (릴리즈 메타데이터)
-5. GitHub Release 업로드 완료
+4. latest 고정 파일명 `.dmg` / `.dmg.sha256`
+5. `metadata.txt` (릴리즈 메타데이터)
+6. GitHub Release 업로드 완료
 
 기본 산출물 위치:
 
 - `build/<AppName>-release/<run-id>-<config>/`
+
+고정 latest URL 패턴:
+
+- `https://github.com/<owner>/<repo>/releases/latest/download/<AppName>.dmg`
+- `https://github.com/<owner>/<repo>/releases/latest/download/<AppName>.dmg.sha256`
 
 최신 산출물 포인터:
 
