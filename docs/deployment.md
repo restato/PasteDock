@@ -1,40 +1,39 @@
 # Deployment Guide (SPM + Developer ID + Notarization)
 
-## 1. 목표 산출물
+## 1. Target Artifacts
 
-릴리즈 완료 기준:
+Release completion criteria:
 
-1. 서명된 `.app` 번들
-2. 서명 + 노타라이즈 + 스테이플된 `.dmg`
-3. `.dmg.sha256` 체크섬
-4. latest 고정 파일명 `.dmg` / `.dmg.sha256`
-5. `metadata.txt` (릴리즈 메타데이터)
-6. GitHub Release 업로드 완료
+1. Signed `.app` bundle
+2. Signed + notarized + stapled `.dmg`
+3. `.dmg.sha256` checksum
+4. Fixed `latest` filenames for `.dmg` / `.dmg.sha256`
+5. `metadata.txt` (release metadata)
+6. GitHub Release upload completed
 
-기본 산출물 위치:
+Default artifact location:
 
 - `build/<AppName>-release/<run-id>-<config>/`
 
-고정 latest URL 패턴:
+Stable latest download URL:
 
-- `https://github.com/<owner>/<repo>/releases/latest/download/<AppName>.dmg`
-- `https://github.com/<owner>/<repo>/releases/latest/download/<AppName>.dmg.sha256`
+- `https://restato.github.io/projects/pastedock/`
 
-최신 산출물 포인터:
+Latest artifact pointer:
 
 - `build/latest-release-dir.txt`
 
-## 2. 사전 준비
+## 2. Prerequisites
 
-필수 준비물:
+Required items:
 
-1. Apple Developer Program 계정
-2. 로그인 키체인에 `Developer ID Application` 인증서 설치
-3. `xcrun notarytool store-credentials`로 notary profile 저장
-4. `gh auth login` 완료(GitHub Releases 업로드용)
-5. `.env.release` 파일 준비(`scripts/.env.release.example` 기반)
+1. Apple Developer Program account
+2. `Developer ID Application` certificate installed in login keychain
+3. Notary profile stored with `xcrun notarytool store-credentials`
+4. `gh auth login` completed (for GitHub Releases upload)
+5. `.env.release` file prepared from `scripts/.env.release.example`
 
-필수 명령:
+Required commands:
 
 - `swift`
 - `codesign`
@@ -44,20 +43,20 @@
 - `gh`
 - `git`
 
-## 3. 환경 변수 설정
+## 3. Environment Variables
 
 ```bash
 cp scripts/.env.release.example .env.release
 ```
 
-필수 변수:
+Required variables:
 
 - `DEVELOPER_ID_APP`
 - `NOTARY_PROFILE`
 - `RELEASE_TAG` (`vX.Y.Z`)
 - `GITHUB_REPOSITORY` (`owner/repo`)
 
-권장 변수:
+Recommended variables:
 
 - `APP_NAME`
 - `APP_TARGET`
@@ -65,7 +64,7 @@ cp scripts/.env.release.example .env.release
 - `MIN_MACOS_VERSION`
 - `GH_RELEASE_NOTES_FILE`
 
-환경 로드:
+Load environment variables:
 
 ```bash
 set -a
@@ -73,58 +72,58 @@ source .env.release
 set +a
 ```
 
-## 4. 릴리즈 실행 절차
+## 4. Release Execution Steps
 
-### Step 1) 아이콘 생성
+### Step 1) Generate icons
 
 ```bash
 bash scripts/generate-app-icon.sh
 ```
 
-확인 파일:
+Verify files:
 
 - `assets/icon/AppIcon.icns`
 - `assets/icon/menuBarTemplate.png`
 
-### Step 2) 패키지 테스트
+### Step 2) Run package tests
 
 ```bash
 swift test
 ```
 
-### Step 3) 로컬 릴리즈 빌드 + 서명 + 노타라이즈
+### Step 3) Build + sign + notarize locally
 
 ```bash
 bash scripts/release-macos-spm.sh release --tag "$RELEASE_TAG"
 ```
 
-옵션:
+Options:
 
-- `--skip-notarize`: 서명/패키징까지만 수행할 때 사용
-- `debug`: 디버그 구성으로 패키징할 때 사용
+- `--skip-notarize`: use when you only need signing/packaging
+- `debug`: use when packaging with debug configuration
 
-### Step 4) GitHub Release 생성 및 에셋 업로드
+### Step 4) Create GitHub Release and upload assets
 
 ```bash
 bash scripts/publish-github-release.sh --tag "$RELEASE_TAG"
 ```
 
-선택 옵션:
+Optional flags:
 
-- `--artifact-dir <dir>`: 업로드할 산출물 디렉터리 명시
-- `--notes <file>`: 릴리즈 노트 파일 명시
-- `--repo owner/repo`: 저장소 명시
+- `--artifact-dir <dir>`: specify artifact directory to upload
+- `--notes <file>`: specify release notes file
+- `--repo owner/repo`: specify repository
 
-## 5. 검증 체크리스트
+## 5. Verification Checklist
 
-앱 서명 검증:
+Verify app signature:
 
 ```bash
 codesign --verify --deep --strict --verbose=2 "<path>/<AppName>.app"
 spctl -a -t exec -vv "<path>/<AppName>.app"
 ```
 
-DMG 검증:
+Verify DMG:
 
 ```bash
 codesign --verify --verbose=2 "<path>/<AppName>-vX.Y.Z.dmg"
@@ -132,61 +131,61 @@ spctl -a -t open --context context:primary-signature -vv "<path>/<AppName>-vX.Y.
 xcrun stapler validate "<path>/<AppName>-vX.Y.Z.dmg"
 ```
 
-체크섬 검증:
+Verify checksum:
 
 ```bash
 shasum -a 256 -c "<path>/<AppName>-vX.Y.Z.dmg.sha256"
 ```
 
-## 6. 장애 대응 런북
+## 6. Failure Runbook
 
-### 6.1 인증서 관련 실패
+### 6.1 Certificate-related failures
 
-증상:
+Symptoms:
 
-- `codesign` 실패
-- 인증서 찾기 실패
+- `codesign` failure
+- Certificate lookup failure
 
-대응:
+Actions:
 
-1. Keychain Access에서 `Developer ID Application` 인증서 존재 확인
-2. `.env.release`의 `DEVELOPER_ID_APP` 값이 정확한지 확인
-3. 필요 시 `security find-identity -v -p codesigning`로 식별자 재확인
+1. Confirm `Developer ID Application` certificate exists in Keychain Access
+2. Confirm `DEVELOPER_ID_APP` in `.env.release` is correct
+3. If needed, re-check identity with `security find-identity -v -p codesigning`
 
-### 6.2 노타라이즈 실패
+### 6.2 Notarization failures
 
-증상:
+Symptoms:
 
-- `notarytool submit` 실패
-- 스테이플 실패
+- `notarytool submit` failure
+- Stapling failure
 
-대응:
+Actions:
 
-1. `NOTARY_PROFILE` 이름 재검증
-2. notary profile 재생성
-3. 스크립트 출력된 notary 로그/요약 확인 후 재실행
+1. Re-verify `NOTARY_PROFILE` name
+2. Recreate the notary profile
+3. Review the notary logs/summary printed by the script and retry
 
-### 6.3 GitHub 업로드 실패
+### 6.3 GitHub upload failures
 
-증상:
+Symptoms:
 
-- `gh release create` 또는 `gh release upload` 실패
+- `gh release create` or `gh release upload` failure
 
-대응:
+Actions:
 
-1. `gh auth status` 확인
-2. `GITHUB_REPOSITORY` 값 확인
-3. 태그 푸시 권한 확인
+1. Check `gh auth status`
+2. Verify `GITHUB_REPOSITORY`
+3. Verify tag push permissions
 
-## 7. 버전 정책
+## 7. Version Policy
 
-버전 단일 소스는 `Git 태그(vX.Y.Z)`입니다.
+The single source of version truth is the Git tag (`vX.Y.Z`).
 
-- `CFBundleShortVersionString`: `v`를 제거한 `X.Y.Z`
-- `CFBundleVersion`: `X.Y.Z.<commit-count>` (기본)
-- 릴리즈 파일명: `<AppName>-vX.Y.Z.dmg`
+- `CFBundleShortVersionString`: `X.Y.Z` (without the `v`)
+- `CFBundleVersion`: `X.Y.Z.<commit-count>` (default)
+- Release filename: `<AppName>-vX.Y.Z.dmg`
 
-## 8. Legacy 경로
+## 8. Legacy Path
 
-`scripts/release-macos-web.sh`는 Xcode 프로젝트/워크스페이스 기반 릴리즈 흐름입니다.  
-현재 저장소의 기본 릴리즈 경로는 `scripts/release-macos-spm.sh`입니다.
+`scripts/release-macos-web.sh` is an Xcode project/workspace-based release flow.  
+The default release path in this repository is `scripts/release-macos-spm.sh`.

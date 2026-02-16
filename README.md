@@ -1,36 +1,37 @@
 # macOS Clipboard Manager (Swift Package)
 
-이 저장소는 `ClipboardCore` 도메인 로직과 메뉴바 데모 앱(`PasteDock`)을 함께 제공합니다.  
-배포는 App Store 없이 `Developer ID + Notary` 기반 DMG 웹 배포를 기본 경로로 사용합니다.
+This repository includes the `ClipboardCore` domain logic and the menu bar demo app (`PasteDock`).  
+The default release path is web distribution of a DMG signed and notarized with `Developer ID + Notary`, without using the App Store.
 
-## 문서
+## Documentation
 
-- 기능 정리: `docs/features.md`
-- 배포 운영 가이드: `docs/deployment.md`
-- 제품/아키텍처 배경: `docs/PRD.md`
-- UI 시안: `docs/ascii-ui-preview.md`
+- Feature overview: `docs/features.md`
+- Deployment operations guide: `docs/deployment.md`
+- Product and architecture context: `docs/PRD.md`
+- Phase 2 plan: `docs/phase2-plan.md`
+- UI mockup: `docs/ascii-ui-preview.md`
 
-## 빠른 시작
+## Quick Start
 
-앱 실행:
+Run the app:
 
 ```bash
 bash scripts/dev-run.sh --rebuild
 ```
 
-테스트 실행:
+Run tests:
 
 ```bash
 swift test
 ```
 
-직접 실행:
+Run directly:
 
 ```bash
 swift run PasteDock
 ```
 
-## 개발 루프
+## Development Loop
 
 ```bash
 bash scripts/dev-run.sh
@@ -40,61 +41,61 @@ bash scripts/dev-stop.sh
 bash scripts/dev-diagnose-accessibility.sh
 ```
 
-보조 스크립트:
+Utility scripts:
 
 ```bash
 bash scripts/open-accessibility.sh
 bash scripts/reveal-dev-app.sh
 ```
 
-런타임 로그:
+Runtime log:
 
 ```bash
 ~/Library/Application Support/com-justdoit-pastedock/logs/runtime.log
 ```
 
-## 앱 아이콘
+## App Icon
 
 ```bash
 bash scripts/generate-app-icon.sh
 ```
 
-- 입력 원본: `assets/icon/source.png`
-- 결과물:
+- Source image: `assets/icon/source.png`
+- Outputs:
   - `assets/icon/AppIcon.iconset/*`
   - `assets/icon/AppIcon.icns`
   - `assets/icon/menuBarTemplate.png`
-- `dev-run.sh`, `package-demo-dmg.sh`, `release-macos-spm.sh`에서 자동 사용
+- Automatically used by `dev-run.sh`, `package-demo-dmg.sh`, and `release-macos-spm.sh`
 
-## 데모 빌드/패키징
+## Demo Build/Packaging
 
-데모 바이너리:
+Demo binary:
 
 ```bash
 bash scripts/build-demo-binary.sh release
 ```
 
-반복 바이너리 빌드:
+Repeated binary builds:
 
 ```bash
 bash scripts/repeat-build-demo.sh 3 release
 ```
 
-데모 DMG(노타라이즈 없음):
+Demo DMG (without notarization):
 
 ```bash
 bash scripts/package-demo-dmg.sh release
 ```
 
-## 정식 릴리즈 (권장: SPM 파이프라인)
+## Production Release (Recommended: SPM Pipeline)
 
-1) 환경 템플릿 복사/수정:
+1) Copy and edit the environment template:
 
 ```bash
 cp scripts/.env.release.example .env.release
 ```
 
-2) 환경 로드:
+2) Load environment variables:
 
 ```bash
 set -a
@@ -102,31 +103,37 @@ source .env.release
 set +a
 ```
 
-3) 서명 + 노타라이즈 + 스테이플 + 체크섬:
+3) Sign + notarize + staple + checksum:
 
 ```bash
 bash scripts/release-macos-spm.sh release --tag "$RELEASE_TAG"
 ```
 
-4) GitHub Release 생성 + 에셋 업로드:
+4) Create a GitHub Release and upload assets:
 
 ```bash
 bash scripts/publish-github-release.sh --tag "$RELEASE_TAG"
 ```
 
-주요 결과물:
+Primary artifacts:
 
 - `build/<AppName>-release/<run-id>-<config>/<AppName>-vX.Y.Z.dmg`
 - `build/<AppName>-release/<run-id>-<config>/<AppName>-vX.Y.Z.dmg.sha256`
+- `build/<AppName>-release/<run-id>-<config>/<AppName>.dmg` (fixed `latest` filename)
+- `build/<AppName>-release/<run-id>-<config>/<AppName>.dmg.sha256` (fixed `latest` filename)
 - `build/<AppName>-release/<run-id>-<config>/metadata.txt`
 
-## Legacy 릴리즈 경로 (Xcode 프로젝트용)
+For a stable latest-download entry point on your landing page:
 
-`scripts/release-macos-web.sh`는 `xcodebuild archive/export` 기반 자동화 스크립트입니다.  
-현재 Swift Package 기본 흐름은 `scripts/release-macos-spm.sh`를 사용합니다.
+- `https://restato.github.io/projects/pastedock/`
 
-## Accessibility 트러블슈팅 요약
+## Legacy Release Path (for Xcode Projects)
 
-- 권한 목록에 앱이 없으면 `bash scripts/reveal-dev-app.sh`로 실제 번들 위치를 열어 수동 추가
-- 권한이 계속 풀리면 `bash scripts/dev-diagnose-accessibility.sh`로 서명 상태 확인
-- `Restored only (permission needed)`가 반복되면 접근성 권한 재허용 후 `Re-check` 실행
+`scripts/release-macos-web.sh` is an automation script based on `xcodebuild archive/export`.  
+The default Swift Package release flow in this repository uses `scripts/release-macos-spm.sh`.
+
+## Accessibility Troubleshooting Summary
+
+- If the app does not appear in the permission list, open the real bundle location with `bash scripts/reveal-dev-app.sh` and add it manually.
+- If Accessibility permission keeps resetting, verify signing status with `bash scripts/dev-diagnose-accessibility.sh`.
+- If `Restored only (permission needed)` repeats, re-enable Accessibility permission and run `Re-check`.
