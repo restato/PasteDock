@@ -11,6 +11,12 @@ The default release path is web distribution of a DMG signed and notarized with 
 - Phase 2 plan: `docs/phase2-plan.md`
 - UI mockup: `docs/ascii-ui-preview.md`
 
+## UI Screenshot
+
+The screenshot below shows the `Clipboard` tab of PasteDock, including the searchable history list, source app/time columns, and the right-side preview panel.
+
+![PasteDock Clipboard UI Screenshot](docs/pastedock-clipboard-screenshot.png)
+
 ## Quick Start
 
 Run the app:
