@@ -184,8 +184,3 @@ The single source of version truth is the Git tag (`vX.Y.Z`).
 - `CFBundleShortVersionString`: `X.Y.Z` (without the `v`)
 - `CFBundleVersion`: `X.Y.Z.<commit-count>` (default)
 - Release filename: `<AppName>-vX.Y.Z.dmg`
-
-## 8. Legacy Path
-
-`scripts/release-macos-web.sh` is an Xcode project/workspace-based release flow.  
-The default release path in this repository is `scripts/release-macos-spm.sh`.

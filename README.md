@@ -127,11 +127,6 @@ For a stable latest-download entry point on your landing page:
 
 - `https://restato.github.io/projects/pastedock/`
 
-## Legacy Release Path (for Xcode Projects)
-
-`scripts/release-macos-web.sh` is an automation script based on `xcodebuild archive/export`.  
-The default Swift Package release flow in this repository uses `scripts/release-macos-spm.sh`.
-
 ## Accessibility Troubleshooting Summary
 
 - If the app does not appear in the permission list, open the real bundle location with `bash scripts/reveal-dev-app.sh` and add it manually.

@@ -14,7 +14,7 @@
 - Language: English only
 - Diagnostics: local logs only
 - Launch: public distribution immediately
-- Release automation: based on `/Users/direcision/Workspace/just-do-it/scripts/release-macos-web.sh`
+- Release automation: based on `/Users/direcision/Workspace/just-do-it/scripts/release-macos-spm.sh`
 
 ### Scope
 1. Included

@@ -3,8 +3,7 @@
 ## Project Structure & Module Organization
 - `Sources/ClipboardCore/`: main Swift module (`Models/`, `Protocols/`, `Services/`, `QuickPicker/`, `Setup/`).
 - `Tests/ClipboardCoreTests/`: unit and behavior tests using Swift Testing (`@Test`, `#expect`).
-- `scripts/`: automation scripts, including `release-macos-web.sh` for signed/notarized DMG release flow.
-- `packaging/ExportOptions.plist`: export settings used by macOS release automation.
+- `scripts/`: automation scripts, including `release-macos-spm.sh` and `publish-github-release.sh` for signed/notarized DMG release flow.
 - `docs/PRD.md`: product and architecture decisions that inform implementation.
 
 ## Build, Test, and Development Commands
@@ -12,7 +11,8 @@
 - `swift test`: run all tests in `Tests/ClipboardCoreTests`.
 - `swift test --filter CapturePipelineTests`: run a focused subset during iteration.
 - `swift package clean`: clear build artifacts when diagnosing stale build issues.
-- `bash scripts/release-macos-web.sh`: execute macOS web release pipeline (requires `.env.release` values loaded).
+- `bash scripts/release-macos-spm.sh release --tag "$RELEASE_TAG"`: build/sign/notarize release artifacts with the SPM pipeline.
+- `bash scripts/publish-github-release.sh --tag "$RELEASE_TAG"`: publish release artifacts to GitHub Releases.
 
 ## Coding Style & Naming Conventions
 - Swift toolchain: 6.2 (`Package.swift`), target macOS 14+.
@@ -31,7 +31,7 @@
 - Git history metadata is not available in this workspace snapshot; follow Conventional Commits (`feat:`, `fix:`, `test:`, `chore:`) until a repo-specific pattern is documented.
 - Keep commits scoped to a single logical change.
 - PRs should include: purpose, key changes, test evidence (`swift test` output summary), and linked issue/ticket.
-- For release-impacting changes, mention updates to `scripts/` or `packaging/` and any notarization/signing implications.
+- For release-impacting changes, mention updates to `scripts/` and any notarization/signing implications.
 
 ## Security & Configuration Tips
 - Do not commit `.env.release` or signing credentials.
